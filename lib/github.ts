@@ -9,10 +9,16 @@ export async function fetchGitHubData(username: string): Promise<GitHubData> {
   };
 
   const [userRes, reposRes] = await Promise.all([
-    fetch(`https://api.github.com/users/${username}`, { headers }),
+    fetch(`https://api.github.com/users/${username}`, {
+      headers,
+      next: { revalidate: 300 },
+    }),
     fetch(
       `https://api.github.com/users/${username}/repos?per_page=100&sort=stars`,
-      { headers }
+      {
+        headers,
+        next: { revalidate: 300 },
+      }
     ),
   ]);
 
