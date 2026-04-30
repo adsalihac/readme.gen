@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --font-mono-stack: var(--font-geist-mono), var(--font-roboto-mono),
+      ui-monospace, SFMono-Regular, 'Roboto Mono', Menlo, Monaco,
+      'Liberation Mono', 'DejaVu Sans Mono', 'Courier New', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-gray-900;
+    font-family: var(--font-mono-stack);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gray-300;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-violet-500/20 text-violet-900;
+  }
+}
+
+@layer utilities {
+  /* glass effect */
+  .glass {
+    @apply border border-gray-200 bg-gray-50 backdrop-blur-sm;
+  }
+
+  /* subtle text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent;
+  }
+}
