@@ -166,7 +166,7 @@ readme.gen/
 │   └── ResultTabs.tsx
 ├── lib/
 │   ├── github.ts
-│   ├── openai.ts
+│   ├── groq.ts
 │   └── promptBuilder.ts
 ├── types/
 │   └── index.ts

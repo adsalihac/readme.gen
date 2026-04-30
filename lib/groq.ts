@@ -1,12 +1,11 @@
-import OpenAI from 'openai';
+import Groq from 'groq-sdk';
 
-let _client: OpenAI | null = null;
+let _client: Groq | null = null;
 
-function getClient(): OpenAI {
+function getClient(): Groq {
   if (!_client) {
-    _client = new OpenAI({
+    _client = new Groq({
       apiKey: process.env.GROQ_API_KEY,
-      baseURL: 'https://api.groq.com/openai/v1',
     });
   }
   return _client;
@@ -17,7 +16,7 @@ export async function generateContent(
   maxTokens = 1200
 ): Promise<string> {
   const response = await getClient().chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
+    model: 'llama-3.1-8b-instant',
     messages: [{ role: 'user', content: prompt }],
     max_tokens: maxTokens,
     temperature: 0.75,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchGitHubData } from '@/lib/github';
-import { generateContent } from '@/lib/openai';
+import { generateContent } from '@/lib/groq';
 import { buildPrompts } from '@/lib/promptBuilder';
 
 // Validate GitHub username format
