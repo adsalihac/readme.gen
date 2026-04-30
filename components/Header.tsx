@@ -1,8 +1,22 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const REPO_URL = 'https://github.com/adsalihac/readme.gen';
 
 export function Header() {
+  const [stars, setStars] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('https://api.github.com/repos/adsalihac/readme.gen', {
+      headers: { Accept: 'application/vnd.github.v3+json' },
+    })
+      .then((r) => r.json())
+      .then((d) => { if (typeof d.stargazers_count === 'number') setStars(d.stargazers_count); })
+      .catch(() => {});
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/90 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
@@ -29,7 +43,12 @@ export function Header() {
             >
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
-            Star
+            <span>Star</span>
+            {stars !== null && (
+              <span className="ml-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                {stars.toLocaleString()}
+              </span>
+            )}
           </a>
 
           {/* Contribute */}

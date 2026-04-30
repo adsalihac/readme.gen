@@ -1,5 +1,7 @@
 # readme.gen
 
+[![GitHub Stars](https://img.shields.io/github/stars/adsalihac/readme.gen?style=for-the-badge&logo=github)](https://github.com/adsalihac/readme.gen/stargazers)
+
 AI-powered GitHub profile content generation for developers who want a cleaner README, sharper bio, stronger skills section, and a sponsor pitch without writing everything from scratch.
 
 ## Overview
@@ -184,6 +186,7 @@ Before deploying, make sure `GROQ_API_KEY` is configured in your hosting environ
 ## Contributing
 
 [![Fork this repo](https://img.shields.io/badge/Fork-readme.gen-blue?style=for-the-badge&logo=github)](https://github.com/adsalihac/readme.gen/fork)
+[![GitHub Stars](https://img.shields.io/github/stars/adsalihac/readme.gen?style=for-the-badge&logo=github)](https://github.com/adsalihac/readme.gen/stargazers)
 
 Issues and pull requests are welcome. If you plan to make larger changes, open an issue first so the scope and direction are clear.
 
