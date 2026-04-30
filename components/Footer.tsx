@@ -3,7 +3,7 @@ const REPO_URL = 'https://github.com/adsalihac/Github-Readme-Generator';
 const LINKS = [
   { label: 'GitHub', href: REPO_URL },
   { label: 'Issues', href: `${REPO_URL}/issues` },
-  { label: 'Contribute', href: `${REPO_URL}/contribute` },
+  { label: 'Contribute', href: `${REPO_URL}/fork` },
   { label: 'License', href: `${REPO_URL}/blob/main/LICENSE` },
 ];
 

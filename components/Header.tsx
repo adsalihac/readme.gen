@@ -34,7 +34,7 @@ export function Header() {
 
           {/* Contribute */}
           <a
-            href={`${REPO_URL}/contribute`}
+            href={`${REPO_URL}/fork`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 rounded-full bg-gray-900 px-4 py-1.5 text-xs font-medium text-white transition-all hover:bg-gray-700"
