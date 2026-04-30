@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const REPO_URL = 'https://github.com/adsalihac/Github-Readme-Generator';
+const REPO_URL = 'https://github.com/adsalihac/readme.gen';
 
 export function Header() {
   return (

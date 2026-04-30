@@ -183,6 +183,8 @@ Before deploying, make sure `GROQ_API_KEY` is configured in your hosting environ
 
 ## Contributing
 
+[![Fork this repo](https://img.shields.io/badge/Fork-readme.gen-blue?style=for-the-badge&logo=github)](https://github.com/adsalihac/readme.gen/fork)
+
 Issues and pull requests are welcome. If you plan to make larger changes, open an issue first so the scope and direction are clear.
 
 ## License

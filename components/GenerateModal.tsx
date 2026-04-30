@@ -24,15 +24,17 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Focus input when modal opens
+  // Focus input when modal opens; reset form state on close
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setUsername('');
       setSuggestions([]);
       setActiveIndex(-1);
       setShowSuggestions(false);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [isOpen]);
 
