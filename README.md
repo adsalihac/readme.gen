@@ -1,7 +1,5 @@
 # readme.gen
 
-[![GitHub Stars](https://img.shields.io/github/stars/adsalihac/readme.gen?style=for-the-badge&logo=github)](https://github.com/adsalihac/readme.gen/stargazers)
-
 AI-powered GitHub profile content generation for developers who want a cleaner README, sharper bio, stronger skills section, and a sponsor pitch without writing everything from scratch.
 
 ## Overview
