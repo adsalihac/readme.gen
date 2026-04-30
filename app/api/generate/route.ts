@@ -6,6 +6,48 @@ import { buildPrompts } from '@/lib/promptBuilder';
 // Validate GitHub username format
 const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 
+function parseRetryHint(message: string): string | null {
+  const marker = 'please try again in ';
+  const index = message.toLowerCase().indexOf(marker);
+
+  if (index === -1) return null;
+
+  const hintStart = index + marker.length;
+  const remainder = message.slice(hintStart).trim();
+  const end = remainder.search(/[.\n]/);
+  const hint = (end === -1 ? remainder : remainder.slice(0, end)).trim();
+
+  return hint || null;
+}
+
+function formatApiError(error: unknown): { status: number; message: string } {
+  const rawMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+  const lower = rawMessage.toLowerCase();
+
+  if (lower.includes('not found')) {
+    return { status: 404, message: rawMessage };
+  }
+
+  if (
+    lower.includes('rate limit') ||
+    lower.includes('too many requests') ||
+    lower.includes('tpm') ||
+    lower.includes('tpd')
+  ) {
+    const retryHint = parseRetryHint(rawMessage);
+    const message = retryHint
+      ? `AI provider rate limit reached. Please try again in ${retryHint}.`
+      : 'AI provider rate limit reached. Please try again in a few minutes.';
+
+    return { status: 429, message };
+  }
+
+  return {
+    status: 500,
+    message: 'Failed to generate README content right now. Please try again shortly.',
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => null);
@@ -53,12 +95,7 @@ export async function POST(req: NextRequest) {
       content: { bio, readme, skills, sponsorPitch },
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'An unexpected error occurred.';
-    const status =
-      message.includes('not found') ? 404
-      : message.includes('rate limit') ? 429
-      : 500;
+    const { status, message } = formatApiError(error);
     return NextResponse.json({ error: message }, { status });
   }
 }
