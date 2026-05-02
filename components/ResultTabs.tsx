@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import type { GeneratedContent, TabKey } from '@/types';
+import type { GenerateOptions, GeneratedContent, TabKey } from '@/types';
 import { MarkdownPreview } from './MarkdownPreview';
 
 interface ResultTabsProps {
   content: GeneratedContent;
+  options: GenerateOptions;
   onRegenerate: () => void;
 }
 
@@ -16,7 +17,18 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'sponsor', label: 'Sponsor' },
 ];
 
-export function ResultTabs({ content, onRegenerate }: ResultTabsProps) {
+function getCurrentFileName(activeTab: TabKey): string {
+  if (activeTab === 'bio') return 'plain text';
+  if (activeTab === 'readme') return 'README.md';
+  if (activeTab === 'skills') return 'skills.md';
+  return 'SPONSOR.md';
+}
+
+export function ResultTabs({
+  content,
+  options,
+  onRegenerate,
+}: Readonly<ResultTabsProps>) {
   const [activeTab, setActiveTab] = useState<TabKey>('bio');
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
 
@@ -57,18 +69,10 @@ export function ResultTabs({ content, onRegenerate }: ResultTabsProps) {
       </div>
 
       {/* Panel */}
-      <div className="relative rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         {/* Toolbar */}
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
-          <span className="text-xs text-gray-400 font-mono">
-            {activeTab === 'bio'
-              ? 'plain text'
-              : activeTab === 'readme'
-              ? 'README.md'
-              : activeTab === 'skills'
-              ? 'skills.md'
-              : 'SPONSOR.md'}
-          </span>
+          <span className="text-xs text-gray-400 font-mono">{getCurrentFileName(activeTab)}</span>
           <div className="flex items-center gap-2">
             <button
               onClick={onRegenerate}
@@ -114,6 +118,9 @@ export function ResultTabs({ content, onRegenerate }: ResultTabsProps) {
 
           {activeTab === 'sponsor' && (
             <div className="animate-fade-in">
+              <div className="mb-3 inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] text-gray-500">
+                Story mode: {options.sponsorNarrative}
+              </div>
               <MarkdownPreview content={content.sponsorPitch} />
             </div>
           )}

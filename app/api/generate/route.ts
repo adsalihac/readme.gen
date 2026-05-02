@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchGitHubData } from '@/lib/github';
 import { generateContent } from '@/lib/groq';
 import { buildPrompts } from '@/lib/promptBuilder';
+import {
+  DEFAULT_GENERATE_OPTIONS,
+  type GenerateOptions,
+  type InsightDepth,
+  type SponsorNarrative,
+  type VoiceStyle,
+} from '@/types';
 
 // Validate GitHub username format
 const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
@@ -14,6 +21,7 @@ type GeneratedPayload = {
     skills: string;
     sponsorPitch: string;
   };
+  optionsUsed: GenerateOptions;
 };
 
 type CacheEntry = {
@@ -108,11 +116,62 @@ function setCachedPayload(username: string, data: GeneratedPayload) {
   });
 }
 
-async function buildGeneratedPayload(username: string): Promise<GeneratedPayload> {
+function asEnumValue<T extends string>(
+  value: unknown,
+  valid: readonly T[],
+  fallback: T
+): T {
+  return typeof value === 'string' && valid.includes(value as T)
+    ? (value as T)
+    : fallback;
+}
+
+function normalizeOptions(raw: unknown): GenerateOptions {
+  if (!raw || typeof raw !== 'object') {
+    return { ...DEFAULT_GENERATE_OPTIONS };
+  }
+
+  const parsed = raw as Partial<GenerateOptions>;
+
+  return {
+    voiceStyle: asEnumValue<VoiceStyle>(
+      parsed.voiceStyle,
+      ['professional', 'friendly', 'bold'],
+      DEFAULT_GENERATE_OPTIONS.voiceStyle
+    ),
+    insightDepth: asEnumValue<InsightDepth>(
+      parsed.insightDepth,
+      ['standard', 'advanced'],
+      DEFAULT_GENERATE_OPTIONS.insightDepth
+    ),
+    sponsorNarrative: asEnumValue<SponsorNarrative>(
+      parsed.sponsorNarrative,
+      ['impact', 'journey', 'milestones'],
+      DEFAULT_GENERATE_OPTIONS.sponsorNarrative
+    ),
+    includeAchievements:
+      typeof parsed.includeAchievements === 'boolean'
+        ? parsed.includeAchievements
+        : DEFAULT_GENERATE_OPTIONS.includeAchievements,
+    includeCallToAction:
+      typeof parsed.includeCallToAction === 'boolean'
+        ? parsed.includeCallToAction
+        : DEFAULT_GENERATE_OPTIONS.includeCallToAction,
+  };
+}
+
+function getCacheKey(username: string, options: GenerateOptions): string {
+  return `${username}:${JSON.stringify(options)}`;
+}
+
+async function buildGeneratedPayload(
+  username: string,
+  options: GenerateOptions
+): Promise<GeneratedPayload> {
   const githubData = await fetchGitHubData(username);
 
   const { bioPrompt, readmePrompt, skillsPrompt, sponsorPrompt } =
-    buildPrompts(githubData);
+    buildPrompts(githubData, options);
 
   const [bio, readme, skills, sponsorPitch] = await Promise.all([
     generateContent(bioPrompt, 200),
@@ -124,6 +183,7 @@ async function buildGeneratedPayload(username: string): Promise<GeneratedPayload
   return {
     githubData,
     content: { bio, readme, skills, sponsorPitch },
+    optionsUsed: options,
   };
 }
 
@@ -210,26 +270,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const cached = getCachedPayload(username);
+    const options = normalizeOptions(body.options);
+    const cacheKey = getCacheKey(username, options);
+
+    const cached = getCachedPayload(cacheKey);
     if (cached) {
       return NextResponse.json({ ...cached, cached: true });
     }
 
-    const pending = inFlightRequests.get(username);
+    const pending = inFlightRequests.get(cacheKey);
     if (pending) {
       const data = await pending;
       return NextResponse.json({ ...data, cached: true });
     }
 
-    const generationPromise = buildGeneratedPayload(username);
-    inFlightRequests.set(username, generationPromise);
+    const generationPromise = buildGeneratedPayload(username, options);
+    inFlightRequests.set(cacheKey, generationPromise);
 
     try {
       const data = await generationPromise;
-      setCachedPayload(username, data);
+      setCachedPayload(cacheKey, data);
       return NextResponse.json({ ...data, cached: false });
     } finally {
-      inFlightRequests.delete(username);
+      inFlightRequests.delete(cacheKey);
     }
   } catch (error) {
     const { status, message } = formatApiError(error);

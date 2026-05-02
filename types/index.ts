@@ -38,9 +38,32 @@ export interface GeneratedContent {
   sponsorPitch: string;
 }
 
+export type VoiceStyle = 'professional' | 'friendly' | 'bold';
+
+export type InsightDepth = 'standard' | 'advanced';
+
+export type SponsorNarrative = 'impact' | 'journey' | 'milestones';
+
+export interface GenerateOptions {
+  voiceStyle: VoiceStyle;
+  insightDepth: InsightDepth;
+  sponsorNarrative: SponsorNarrative;
+  includeAchievements: boolean;
+  includeCallToAction: boolean;
+}
+
+export const DEFAULT_GENERATE_OPTIONS: GenerateOptions = {
+  voiceStyle: 'professional',
+  insightDepth: 'advanced',
+  sponsorNarrative: 'impact',
+  includeAchievements: true,
+  includeCallToAction: true,
+};
+
 export type TabKey = 'bio' | 'readme' | 'skills' | 'sponsor';
 
 export interface GenerateResponse {
   githubData: GitHubData;
   content: GeneratedContent;
+  optionsUsed: GenerateOptions;
 }

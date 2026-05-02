@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { DEFAULT_GENERATE_OPTIONS, type GenerateOptions } from '@/types';
 
 interface GitHubSuggestion {
   login: string;
@@ -12,11 +13,33 @@ interface GitHubSuggestion {
 interface GenerateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onGenerate: (username: string) => void;
+  onGenerate: (username: string, options: GenerateOptions) => void;
 }
 
-export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProps) {
+const VOICES: Array<{ label: string; value: GenerateOptions['voiceStyle'] }> = [
+  { label: 'Professional', value: 'professional' },
+  { label: 'Friendly', value: 'friendly' },
+  { label: 'Bold', value: 'bold' },
+];
+
+const NARRATIVES: Array<{
+  label: string;
+  value: GenerateOptions['sponsorNarrative'];
+}> = [
+  { label: 'Impact', value: 'impact' },
+  { label: 'Journey', value: 'journey' },
+  { label: 'Milestones', value: 'milestones' },
+];
+
+export function GenerateModal({
+  isOpen,
+  onClose,
+  onGenerate,
+}: Readonly<GenerateModalProps>) {
   const [username, setUsername] = useState('');
+  const [options, setOptions] = useState<GenerateOptions>(
+    { ...DEFAULT_GENERATE_OPTIONS }
+  );
   const [suggestions, setSuggestions] = useState<GitHubSuggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -34,6 +57,7 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
       setSuggestions([]);
       setActiveIndex(-1);
       setShowSuggestions(false);
+      setOptions({ ...DEFAULT_GENERATE_OPTIONS });
       /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [isOpen]);
@@ -97,9 +121,36 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
   const handleSubmit = () => {
     const trimmed = username.trim();
     if (!trimmed) return;
-    onGenerate(trimmed);
+    onGenerate(trimmed, options);
     onClose();
   };
+
+  const clearUsername = () => {
+    setUsername('');
+    setSuggestions([]);
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  };
+
+  const inputSuffix = isSearching ? (
+    <svg className="h-4 w-4 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  ) : null;
+
+  const clearButton = !isSearching && username ? (
+    <button
+      type="button"
+      onClick={clearUsername}
+      className="text-gray-400 hover:text-gray-700"
+      aria-label="Clear"
+    >
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  ) : null;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!showSuggestions) {
@@ -127,19 +178,17 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      aria-modal="true"
-      role="dialog"
-    >
+    <dialog open className="fixed inset-0 z-50 m-0 flex h-screen w-screen items-center justify-center bg-transparent p-4">
       {/* Backdrop */}
-      <div
+      <button
+        type="button"
+        aria-label="Close modal"
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal panel */}
-      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-gray-200 bg-white shadow-xl">
+      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <div>
@@ -158,7 +207,7 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
         </div>
 
         {/* Body */}
-        <div className="p-5">
+        <div className="max-h-[70vh] overflow-y-auto p-5">
           {/* Search input */}
           <div className="relative">
             <div className="relative flex items-center">
@@ -182,23 +231,8 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
               />
               {/* Search spinner or clear */}
               <span className="absolute right-3.5">
-                {isSearching ? (
-                  <svg className="h-4 w-4 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                ) : username ? (
-                  <button
-                    type="button"
-                    onClick={() => { setUsername(''); setSuggestions([]); setShowSuggestions(false); inputRef.current?.focus(); }}
-                    className="text-gray-400 hover:text-gray-700"
-                    aria-label="Clear"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                ) : null}
+                {inputSuffix}
+                {clearButton}
               </span>
             </div>
 
@@ -264,6 +298,142 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
               ))}
             </div>
           </div>
+
+          <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Customization
+              </p>
+              <button
+                type="button"
+                onClick={() => setOptions({ ...DEFAULT_GENERATE_OPTIONS })}
+                className="text-xs text-gray-500 transition-colors hover:text-gray-900"
+              >
+                Reset
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <p className="mb-2 text-xs text-gray-500">Voice style</p>
+                <div className="flex flex-wrap gap-2">
+                  {VOICES.map((voice) => (
+                    <button
+                      key={voice.value}
+                      type="button"
+                      onClick={() =>
+                        setOptions((prev) => ({
+                          ...prev,
+                          voiceStyle: voice.value,
+                        }))
+                      }
+                      className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                        options.voiceStyle === voice.value
+                          ? 'border-gray-900 bg-gray-900 text-white'
+                          : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
+                      }`}
+                    >
+                      {voice.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs text-gray-500">Profile insights</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOptions((prev) => ({
+                        ...prev,
+                        insightDepth: 'standard',
+                      }))
+                    }
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                      options.insightDepth === 'standard'
+                        ? 'border-gray-900 bg-gray-900 text-white'
+                        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
+                    }`}
+                  >
+                    Standard
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOptions((prev) => ({
+                        ...prev,
+                        insightDepth: 'advanced',
+                      }))
+                    }
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                      options.insightDepth === 'advanced'
+                        ? 'border-gray-900 bg-gray-900 text-white'
+                        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
+                    }`}
+                  >
+                    Advanced
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs text-gray-500">Sponsor storytelling</p>
+                <div className="flex flex-wrap gap-2">
+                  {NARRATIVES.map((narrative) => (
+                    <button
+                      key={narrative.value}
+                      type="button"
+                      onClick={() =>
+                        setOptions((prev) => ({
+                          ...prev,
+                          sponsorNarrative: narrative.value,
+                        }))
+                      }
+                      className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                        options.sponsorNarrative === narrative.value
+                          ? 'border-gray-900 bg-gray-900 text-white'
+                          : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
+                      }`}
+                    >
+                      {narrative.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={options.includeAchievements}
+                    onChange={(e) =>
+                      setOptions((prev) => ({
+                        ...prev,
+                        includeAchievements: e.target.checked,
+                      }))
+                    }
+                    className="h-3.5 w-3.5"
+                  />
+                  <span>Include achievements section</span>
+                </label>
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={options.includeCallToAction}
+                    onChange={(e) =>
+                      setOptions((prev) => ({
+                        ...prev,
+                        includeCallToAction: e.target.checked,
+                      }))
+                    }
+                    className="h-3.5 w-3.5"
+                  />
+                  <span>Add sponsor call to action</span>
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
@@ -281,6 +451,6 @@ export function GenerateModal({ isOpen, onClose, onGenerate }: GenerateModalProp
           </button>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }

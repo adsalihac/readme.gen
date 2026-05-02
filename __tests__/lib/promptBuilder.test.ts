@@ -137,4 +137,27 @@ describe('buildPrompts', () => {
     const { bioPrompt } = buildPrompts(data);
     expect(bioPrompt).toContain('Total Stars Earned: 999');
   });
+
+  it('includes selected customization options in prompt context', () => {
+    const { bioPrompt } = buildPrompts(makeData(), {
+      voiceStyle: 'bold',
+      insightDepth: 'advanced',
+      sponsorNarrative: 'journey',
+      includeAchievements: false,
+      includeCallToAction: false,
+    });
+
+    expect(bioPrompt).toContain('Requested Voice Style: bold');
+    expect(bioPrompt).toContain('Sponsor Narrative: journey');
+  });
+
+  it('respects the includeCallToAction option for sponsor prompt', () => {
+    const { sponsorPrompt } = buildPrompts(makeData(), {
+      includeCallToAction: false,
+    });
+
+    expect(sponsorPrompt).toContain(
+      'Do not include an explicit call-to-action sentence.'
+    );
+  });
 });

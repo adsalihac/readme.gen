@@ -9,7 +9,7 @@ import { LoadingState } from '@/components/LoadingState';
 import { ErrorState } from '@/components/ErrorState';
 import { ResultTabs } from '@/components/ResultTabs';
 import { ProfileCard } from '@/components/ProfileCard';
-import type { GenerateResponse } from '@/types';
+import { DEFAULT_GENERATE_OPTIONS, type GenerateOptions, type GenerateResponse } from '@/types';
 
 type AppState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -19,9 +19,12 @@ export default function Home() {
   const [error, setError] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [generationOptions, setGenerationOptions] =
+    useState<GenerateOptions>(DEFAULT_GENERATE_OPTIONS);
 
-  const handleGenerate = async (username: string) => {
+  const handleGenerate = async (username: string, options: GenerateOptions) => {
     setCurrentUsername(username);
+    setGenerationOptions(options);
     setAppState('loading');
     setError('');
 
@@ -29,7 +32,7 @@ export default function Home() {
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ username, options }),
       });
 
       const data = await res.json();
@@ -53,7 +56,7 @@ export default function Home() {
   };
 
   const handleRegenerate = () => {
-    if (currentUsername) handleGenerate(currentUsername);
+    if (currentUsername) handleGenerate(currentUsername, generationOptions);
   };
 
   return (
@@ -63,9 +66,9 @@ export default function Home() {
       <GenerateModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onGenerate={(username) => {
+        onGenerate={(username, options) => {
           setIsModalOpen(false);
-          handleGenerate(username);
+          handleGenerate(username, options);
         }}
       />
 
@@ -117,12 +120,12 @@ export default function Home() {
               </div>
 
               <ProfileCard
-                user={result.githubData.user}
-                totalStars={result.githubData.totalStars}
+                githubData={result.githubData}
               />
 
               <ResultTabs
                 content={result.content}
+                options={result.optionsUsed}
                 onRegenerate={handleRegenerate}
               />
             </div>
