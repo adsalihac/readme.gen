@@ -14,9 +14,17 @@ export function Footer() {
         {/* Single row: branding left · links center · follow right */}
         <div className="flex flex-wrap items-center justify-between gap-3">
 
-          {/* Left: logo + name */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900">readme.gen</span>
+          {/* Left: support button */}
+          <div className="flex items-center gap-4">
+            <a
+              href="https://buymeacoffee.com/adsalihac"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/60 bg-amber-50/60 px-3 py-1.5 text-xs font-semibold text-amber-700 shadow-sm backdrop-blur-sm transition hover:border-amber-400/60 hover:bg-amber-100/80"
+            >
+              <span>☕</span>
+              <span>Buy me a coffee</span>
+            </a>
           </div>
 
           {/* Center: nav links */}
