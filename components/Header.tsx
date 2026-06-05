@@ -29,6 +29,14 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Pricing Link */}
+          <a
+            href="#pricing"
+            className="mr-2 px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            Pricing
+          </a>
+
           {/* Star on GitHub */}
           <a
             href={REPO_URL}

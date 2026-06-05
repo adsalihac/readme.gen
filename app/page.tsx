@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Hero } from '@/components/Hero';
+import { Pricing } from '@/components/Pricing';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { GenerateModal } from '@/components/GenerateModal';
@@ -77,9 +78,12 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[300px] bg-gradient-to-b from-gray-50 to-transparent" />
 
         <div className="relative z-10 flex flex-1 flex-col">
-          {/* ─── Idle: landing hero ─── */}
+          {/* ─── Idle: landing hero + pricing ─── */}
           {appState === 'idle' && (
-            <Hero onOpenModal={() => setIsModalOpen(true)} />
+            <>
+              <Hero onOpenModal={() => setIsModalOpen(true)} />
+              <Pricing onStartGenerating={() => setIsModalOpen(true)} />
+            </>
           )}
 
           {/* ─── Loading ─── */}

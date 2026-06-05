@@ -332,7 +332,10 @@ function generateReadme(
     ...connectLinks,
   ];
 
-  return sections.join('\n');
+  return (
+    sections.join('\n') +
+    '\n\n---\n\n<p align="center">Generated with ❤️ using <a href="https://github.com/adsalihac/readme.gen">readme.gen</a></p>'
+  );
 }
 
 function generateInsights(
