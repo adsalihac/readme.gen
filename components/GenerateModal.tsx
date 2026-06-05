@@ -312,7 +312,7 @@ export function GenerateModal({
           <div className="mt-4">
             <p className="mb-2 text-xs text-gray-400">Try an example:</p>
             <div className="flex flex-wrap gap-2">
-              {['adsalihac', 'expo', 'sindresorhus', 'yyx990803'].map((example) => (
+              {['adsalihac', 'expo'].map((example) => (
                 <button
                   key={example}
                   type="button"
