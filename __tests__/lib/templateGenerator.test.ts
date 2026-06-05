@@ -182,7 +182,7 @@ describe('readme generation', () => {
 
   it('contains featured projects section', () => {
     const { readme } = generateFromTemplate(MOCK_DATA, opts());
-    expect(readme).toContain('## 🚀 Featured Projects');
+    expect(readme).toContain('## Featured Projects');
     expect(readme).toContain('awesome-tool');
   });
 
@@ -322,5 +322,50 @@ describe('determinism', () => {
     expect(professional.bio).not.toBe(friendly.bio);
     expect(professional.bio).not.toBe(bold.bio);
     expect(friendly.bio).not.toBe(bold.bio);
+  });
+});
+
+// ─── Professional Features ───────────────────────────────────────────────────
+
+describe('professional features generation', () => {
+  it('includes experience section when workExperiences are provided', () => {
+    const experiences = [
+      {
+        company: 'Google',
+        role: 'Staff Engineer',
+        period: '2023 - Present',
+        description: 'Worked on Gemini models\nDesigned AI agent architecture',
+      },
+    ];
+    const { readme } = generateFromTemplate(MOCK_DATA, opts({ workExperiences: experiences }));
+    expect(readme).toContain('## 💼 Experience');
+    expect(readme).toContain('### **Google** — *Staff Engineer*');
+    expect(readme).toContain('`2023 - Present`');
+    expect(readme).toContain('- Worked on Gemini models');
+    expect(readme).toContain('- Designed AI agent architecture');
+  });
+
+  it('includes WakaTime card when wakatimeUsername is provided', () => {
+    const { readme } = generateFromTemplate(MOCK_DATA, opts({ wakatimeUsername: 'wakatimetester' }));
+    expect(readme).toContain('github-readme-stats.vercel.app/api/wakatime?username=wakatimetester');
+  });
+
+  it('includes Streak stats card when includeStreakStats is true', () => {
+    const { readme } = generateFromTemplate(MOCK_DATA, opts({ includeStreakStats: true }));
+    expect(readme).toContain('github-readme-streak-stats.herokuapp.com/?user=testuser');
+  });
+
+  it('includes blog section and outputs workflow when blogFeedUrl is provided', () => {
+    const feedUrl = 'https://medium.com/feed/@testuser';
+    const result = generateFromTemplate(MOCK_DATA, opts({ blogFeedUrl: feedUrl }));
+    
+    expect(result.readme).toContain('## ✍️ Recent Blog Posts');
+    expect(result.readme).toContain('<!-- START_SECTION:blog-posts -->');
+    expect(result.readme).toContain('<!-- END_SECTION:blog-posts -->');
+    
+    expect(result.blogWorkflow).toBeDefined();
+    expect(result.blogWorkflow).toContain('Latest Blog Posts Workflow');
+    expect(result.blogWorkflow).toContain(feedUrl);
+    expect(result.blogWorkflow).toContain('gautamkrishnar/blog-post-workflow');
   });
 });

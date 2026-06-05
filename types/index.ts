@@ -31,11 +31,19 @@ export interface GitHubData {
   totalStars: number;
 }
 
+export interface WorkExperience {
+  company: string;
+  role: string;
+  period: string;
+  description: string;
+}
+
 export interface GeneratedContent {
   bio: string;
   readme: string;
   skills: string;
   sponsorPitch: string;
+  blogWorkflow?: string;
 }
 
 export type VoiceStyle = 'professional' | 'friendly' | 'bold';
@@ -50,6 +58,10 @@ export interface GenerateOptions {
   sponsorNarrative: SponsorNarrative;
   includeAchievements: boolean;
   includeCallToAction: boolean;
+  workExperiences?: WorkExperience[];
+  wakatimeUsername?: string;
+  includeStreakStats?: boolean;
+  blogFeedUrl?: string;
 }
 
 export const DEFAULT_GENERATE_OPTIONS: GenerateOptions = {
@@ -58,9 +70,13 @@ export const DEFAULT_GENERATE_OPTIONS: GenerateOptions = {
   sponsorNarrative: 'impact',
   includeAchievements: true,
   includeCallToAction: true,
+  workExperiences: [],
+  wakatimeUsername: '',
+  includeStreakStats: false,
+  blogFeedUrl: '',
 };
 
-export type TabKey = 'bio' | 'readme' | 'skills' | 'sponsor';
+export type TabKey = 'bio' | 'readme' | 'skills' | 'sponsor' | 'deploy';
 
 export interface GenerateResponse {
   githubData: GitHubData;

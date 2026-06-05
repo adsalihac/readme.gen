@@ -7,6 +7,7 @@ import {
   type InsightDepth,
   type SponsorNarrative,
   type VoiceStyle,
+  type WorkExperience,
 } from '@/types';
 
 // Validate GitHub username format
@@ -156,6 +157,30 @@ function normalizeOptions(raw: unknown): GenerateOptions {
       typeof parsed.includeCallToAction === 'boolean'
         ? parsed.includeCallToAction
         : DEFAULT_GENERATE_OPTIONS.includeCallToAction,
+    workExperiences: Array.isArray(parsed.workExperiences)
+      ? parsed.workExperiences
+          .map((item: any) => {
+            if (item && typeof item === 'object') {
+              return {
+                company: String(item.company ?? ''),
+                role: String(item.role ?? ''),
+                period: String(item.period ?? ''),
+                description: String(item.description ?? ''),
+              };
+            }
+            return null;
+          })
+          .filter(Boolean) as WorkExperience[]
+      : DEFAULT_GENERATE_OPTIONS.workExperiences,
+    wakatimeUsername: typeof parsed.wakatimeUsername === 'string'
+      ? parsed.wakatimeUsername
+      : DEFAULT_GENERATE_OPTIONS.wakatimeUsername,
+    includeStreakStats: typeof parsed.includeStreakStats === 'boolean'
+      ? parsed.includeStreakStats
+      : DEFAULT_GENERATE_OPTIONS.includeStreakStats,
+    blogFeedUrl: typeof parsed.blogFeedUrl === 'string'
+      ? parsed.blogFeedUrl
+      : DEFAULT_GENERATE_OPTIONS.blogFeedUrl,
   };
 }
 

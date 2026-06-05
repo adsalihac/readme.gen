@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { DEFAULT_GENERATE_OPTIONS, type GenerateOptions } from '@/types';
+import { DEFAULT_GENERATE_OPTIONS, type GenerateOptions, type WorkExperience } from '@/types';
 
 interface GitHubSuggestion {
   login: string;
@@ -44,8 +44,34 @@ export function GenerateModal({
   const [isSearching, setIsSearching] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [configTab, setConfigTab] = useState<'basics' | 'experience' | 'integrations'>('basics');
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const addExperience = () => {
+    setOptions((prev) => ({
+      ...prev,
+      workExperiences: [
+        ...(prev.workExperiences ?? []),
+        { company: '', role: '', period: '', description: '' },
+      ],
+    }));
+  };
+
+  const updateExperience = (index: number, key: keyof WorkExperience, value: string) => {
+    setOptions((prev) => {
+      const copy = [...(prev.workExperiences ?? [])];
+      copy[index] = { ...copy[index], [key]: value };
+      return { ...prev, workExperiences: copy };
+    });
+  };
+
+  const removeExperience = (index: number) => {
+    setOptions((prev) => ({
+      ...prev,
+      workExperiences: (prev.workExperiences ?? []).filter((_, i) => i !== index),
+    }));
+  };
 
   // Focus input when modal opens; reset form state on close
   useEffect(() => {
@@ -300,10 +326,36 @@ export function GenerateModal({
           </div>
 
           <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Customization
-              </p>
+            <div className="mb-3 flex items-center justify-between border-b border-gray-200 pb-2">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfigTab('basics')}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-md transition-colors ${
+                    configTab === 'basics' ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  Basics
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfigTab('experience')}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-md transition-colors ${
+                    configTab === 'experience' ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  Experience
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfigTab('integrations')}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-md transition-colors ${
+                    configTab === 'integrations' ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  Integrations
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => setOptions({ ...DEFAULT_GENERATE_OPTIONS })}
@@ -313,126 +365,240 @@ export function GenerateModal({
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="mb-2 text-xs text-gray-500">Voice style</p>
-                <div className="flex flex-wrap gap-2">
-                  {VOICES.map((voice) => (
+            {configTab === 'basics' && (
+              <div className="space-y-4">
+                <div>
+                  <p className="mb-2 text-xs text-gray-500">Voice style</p>
+                  <div className="flex flex-wrap gap-2">
+                    {VOICES.map((voice) => (
+                      <button
+                        key={voice.value}
+                        type="button"
+                        onClick={() =>
+                          setOptions((prev) => ({
+                            ...prev,
+                            voiceStyle: voice.value,
+                          }))
+                        }
+                        className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                          options.voiceStyle === voice.value
+                            ? 'border-gray-900 bg-gray-900 text-white'
+                            : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
+                        }`}
+                      >
+                        {voice.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="mb-2 text-xs text-gray-500">Profile insights</p>
+                  <div className="flex gap-2">
                     <button
-                      key={voice.value}
                       type="button"
                       onClick={() =>
                         setOptions((prev) => ({
                           ...prev,
-                          voiceStyle: voice.value,
+                          insightDepth: 'standard',
                         }))
                       }
                       className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                        options.voiceStyle === voice.value
+                        options.insightDepth === 'standard'
                           ? 'border-gray-900 bg-gray-900 text-white'
                           : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
                       }`}
                     >
-                      {voice.label}
+                      Standard
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs text-gray-500">Profile insights</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setOptions((prev) => ({
-                        ...prev,
-                        insightDepth: 'standard',
-                      }))
-                    }
-                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                      options.insightDepth === 'standard'
-                        ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
-                    }`}
-                  >
-                    Standard
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setOptions((prev) => ({
-                        ...prev,
-                        insightDepth: 'advanced',
-                      }))
-                    }
-                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                      options.insightDepth === 'advanced'
-                        ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
-                    }`}
-                  >
-                    Advanced
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs text-gray-500">Sponsor storytelling</p>
-                <div className="flex flex-wrap gap-2">
-                  {NARRATIVES.map((narrative) => (
                     <button
-                      key={narrative.value}
                       type="button"
                       onClick={() =>
                         setOptions((prev) => ({
                           ...prev,
-                          sponsorNarrative: narrative.value,
+                          insightDepth: 'advanced',
                         }))
                       }
                       className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                        options.sponsorNarrative === narrative.value
+                        options.insightDepth === 'advanced'
                           ? 'border-gray-900 bg-gray-900 text-white'
                           : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
                       }`}
                     >
-                      {narrative.label}
+                      Advanced
                     </button>
-                  ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="mb-2 text-xs text-gray-500">Sponsor storytelling</p>
+                  <div className="flex flex-wrap gap-2">
+                    {NARRATIVES.map((narrative) => (
+                      <button
+                        key={narrative.value}
+                        type="button"
+                        onClick={() =>
+                          setOptions((prev) => ({
+                            ...prev,
+                            sponsorNarrative: narrative.value,
+                          }))
+                        }
+                        className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                          options.sponsorNarrative === narrative.value
+                            ? 'border-gray-900 bg-gray-900 text-white'
+                            : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
+                        }`}
+                      >
+                        {narrative.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={options.includeAchievements}
+                      onChange={(e) =>
+                        setOptions((prev) => ({
+                          ...prev,
+                          includeAchievements: e.target.checked,
+                        }))
+                      }
+                      className="h-3.5 w-3.5"
+                    />
+                    <span>Include achievements section</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={options.includeCallToAction}
+                      onChange={(e) =>
+                        setOptions((prev) => ({
+                          ...prev,
+                          includeCallToAction: e.target.checked,
+                        }))
+                      }
+                      className="h-3.5 w-3.5"
+                    />
+                    <span>Add sponsor call to action</span>
+                  </label>
                 </div>
               </div>
+            )}
 
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
-                  <input
-                    type="checkbox"
-                    checked={options.includeAchievements}
-                    onChange={(e) =>
-                      setOptions((prev) => ({
-                        ...prev,
-                        includeAchievements: e.target.checked,
-                      }))
-                    }
-                    className="h-3.5 w-3.5"
-                  />
-                  <span>Include achievements section</span>
-                </label>
-                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
-                  <input
-                    type="checkbox"
-                    checked={options.includeCallToAction}
-                    onChange={(e) =>
-                      setOptions((prev) => ({
-                        ...prev,
-                        includeCallToAction: e.target.checked,
-                      }))
-                    }
-                    className="h-3.5 w-3.5"
-                  />
-                  <span>Add sponsor call to action</span>
-                </label>
+            {configTab === 'experience' && (
+              <div className="space-y-3 max-h-[35vh] overflow-y-auto pr-1">
+                <p className="text-xs text-gray-500 mb-2">Showcase your professional work experiences:</p>
+                {(options.workExperiences ?? []).map((exp, index) => (
+                  <div key={index} className="relative rounded-lg border border-gray-200 bg-white p-3 space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => removeExperience(index)}
+                      className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                    <div className="grid grid-cols-2 gap-2 pr-6">
+                      <input
+                        type="text"
+                        placeholder="Company"
+                        value={exp.company}
+                        onChange={(e) => updateExperience(index, 'company', e.target.value)}
+                        className="rounded border border-gray-200 px-2 py-1 text-xs outline-none focus:border-gray-400"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Role"
+                        value={exp.role}
+                        onChange={(e) => updateExperience(index, 'role', e.target.value)}
+                        className="rounded border border-gray-200 px-2 py-1 text-xs outline-none focus:border-gray-400"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      <input
+                        type="text"
+                        placeholder="Duration (e.g. 2024 - Present)"
+                        value={exp.period}
+                        onChange={(e) => updateExperience(index, 'period', e.target.value)}
+                        className="rounded border border-gray-200 px-2 py-1 text-xs outline-none focus:border-gray-400"
+                      />
+                      <textarea
+                        placeholder="Description (one bullet point per line)"
+                        rows={3}
+                        value={exp.description}
+                        onChange={(e) => updateExperience(index, 'description', e.target.value)}
+                        className="rounded border border-gray-200 px-2 py-1 text-xs outline-none focus:border-gray-400 resize-none"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addExperience}
+                  className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-dashed border-gray-300 py-2.5 text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-100"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add Work Experience
+                </button>
               </div>
-            </div>
+            )}
+
+            {configTab === 'integrations' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1 font-medium">WakaTime Username</label>
+                  <input
+                    type="text"
+                    placeholder="Enter WakaTime username"
+                    value={options.wakatimeUsername ?? ''}
+                    onChange={(e) =>
+                      setOptions((prev) => ({
+                        ...prev,
+                        wakatimeUsername: e.target.value,
+                      }))
+                    }
+                    className="w-full rounded border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 outline-none focus:border-gray-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1 font-medium">Blog RSS Feed URL</label>
+                  <input
+                    type="url"
+                    placeholder="e.g. https://medium.com/feed/@username"
+                    value={options.blogFeedUrl ?? ''}
+                    onChange={(e) =>
+                      setOptions((prev) => ({
+                        ...prev,
+                        blogFeedUrl: e.target.value,
+                      }))
+                    }
+                    className="w-full rounded border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 outline-none focus:border-gray-400"
+                  />
+                </div>
+                <div>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={options.includeStreakStats ?? false}
+                      onChange={(e) =>
+                        setOptions((prev) => ({
+                          ...prev,
+                          includeStreakStats: e.target.checked,
+                        }))
+                      }
+                      className="h-3.5 w-3.5"
+                    />
+                    <span>Include GitHub Streak Stats Card</span>
+                  </label>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

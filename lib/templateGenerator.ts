@@ -225,7 +225,7 @@ function generateReadme(
   const greetings: Record<string, string> = {
     professional: `# Hi, I'm ${name} 👋`,
     friendly:     `# Hey there! I'm ${name} 👋😊`,
-    bold:         `# ${name} 🚀`,
+    bold:         `# ${name}`,
   };
   const greeting = greetings[options.voiceStyle] ?? greetings.professional;
 
@@ -245,8 +245,30 @@ function generateReadme(
     .filter(Boolean)
     .join(' ');
 
-  // GitHub Stats
-  const statsUrl = `https://github-readme-stats.vercel.app/api?username=${user.login}&show_icons=true&theme=tokyonight`;
+  // Professional Experience
+  let experienceSection = '';
+  if (options.workExperiences && options.workExperiences.length > 0) {
+    const expItems = options.workExperiences.map((exp) => {
+      const bulletPoints = exp.description
+        .split(/\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => line.startsWith('-') ? line : `- ${line}`)
+        .join('\n');
+      return `### **${exp.company}** — *${exp.role}*\n\`${exp.period}\`\n${bulletPoints}\n`;
+    });
+    experienceSection = `## 💼 Experience\n\n${expItems.join('\n')}`;
+  }
+
+  // GitHub Stats, Streak and WakaTime
+  const statsCard = `![GitHub Stats](https://github-readme-stats.vercel.app/api?username=${user.login}&show_icons=true&theme=tokyonight)`;
+  const streakCard = options.includeStreakStats
+    ? `\n![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user=${user.login}&theme=tokyonight)`
+    : '';
+  const wakatimeCard = options.wakatimeUsername
+    ? `\n![WakaTime Stats](https://github-readme-stats.vercel.app/api/wakatime?username=${options.wakatimeUsername}&layout=compact&theme=tokyonight)`
+    : '';
+  const statsSection = `${statsCard}${streakCard}${wakatimeCard}`;
 
   // Featured Projects
   const featuredLines = topRepos.map((r) => {
@@ -254,6 +276,12 @@ function generateReadme(
     const langSuffix = r.language ? ` \`${r.language}\`` : '';
     return `- [**${r.name}**](${r.html_url}) — ${desc} ⭐ ${r.stargazers_count}${langSuffix}`;
   });
+
+  // Blog Section
+  let blogSection = '';
+  if (options.blogFeedUrl) {
+    blogSection = `## ✍️ Recent Blog Posts\n\n<!-- START_SECTION:blog-posts -->\n<!-- END_SECTION:blog-posts -->\n`;
+  }
 
   // Connect
   const connectLinks: string[] = [
@@ -284,20 +312,22 @@ function generateReadme(
     '',
     techBadges || '_No recognized languages detected_',
     '',
-    '## 📊 GitHub Stats',
-    '',
-    `![GitHub Stats](${statsUrl})`,
-    '',
-    '## 🚀 Featured Projects',
+    ...(experienceSection ? [experienceSection, ''] : []),
+    '##  Featured Projects',
     '',
     ...(featuredLines.length > 0 ? featuredLines : ['_No public repositories yet_']),
     '',
-    '## 🔍 Profile Insights',
+    '##  📊 GitHub Stats',
+    '',
+    statsSection,
+    '',
+    ...(blogSection ? [blogSection, ''] : []),
+    '##  🔍 Profile Insights',
     '',
     ...insights,
     '',
     ...(achievementsSection ? [achievementsSection, ''] : []),
-    '## 📫 Connect',
+    '##  📫 Connect',
     '',
     ...connectLinks,
   ];
@@ -557,6 +587,26 @@ function generateSponsorPitch(
     .trim();
 }
 
+function generateBlogWorkflow(feedUrl: string): string {
+  return `name: Latest Blog Posts Workflow
+on:
+  schedule:
+    # Runs every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    name: Update this README with latest blog posts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: gautamkrishnar/blog-post-workflow@master
+        with:
+          feed_list: "${feedUrl}"
+`;
+}
+
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function generateFromTemplate(
@@ -568,5 +618,6 @@ export function generateFromTemplate(
     readme: generateReadme(data, options),
     skills: generateSkills(data),
     sponsorPitch: generateSponsorPitch(data, options),
+    blogWorkflow: options.blogFeedUrl ? generateBlogWorkflow(options.blogFeedUrl) : undefined,
   };
 }
