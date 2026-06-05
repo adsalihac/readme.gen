@@ -1,18 +1,18 @@
 # readme.gen
 
-AI-powered GitHub profile content generation for developers who want a cleaner README, sharper bio, stronger skills section, and a sponsor pitch without writing everything from scratch.
+GitHub profile content generation for developers who want a cleaner README, sharper bio, stronger skills section, and a sponsor pitch without writing everything from scratch.
 
 ## Overview
 
-readme.gen takes a GitHub username, fetches public profile and repository data, and turns it into polished profile content using Groq-hosted models.
+readme.gen takes a GitHub username, fetches public profile and repository data, and turns it into polished profile content using a deterministic template engine. This ensures instant response times, zero server costs, and no requirement for third-party AI keys.
 
-The app is built as a Next.js App Router project with a minimal UI, server-side API generation, markdown preview support, and copy-ready outputs for multiple profile sections.
+The app is built as a Next.js App Router project with a minimal UI, server-side content generation, markdown preview support, and copy-ready outputs for multiple profile sections.
 
 ## Tech Stack
 
 - Frontend: Next.js 16, React 19, TypeScript
 - Styling: Tailwind CSS, `@tailwindcss/typography`
-- AI Provider: Groq
+- Content Generation: Client/Server template engine with custom heuristics
 - Markdown Rendering: `react-markdown`, `remark-gfm`
 - Data Source: GitHub REST API
 
@@ -20,8 +20,8 @@ The app is built as a Next.js App Router project with a minimal UI, server-side 
 
 1. A user enters a GitHub username in the UI.
 2. The app validates the username and requests GitHub profile and repository data.
-3. Prompt builders turn that data into focused generation prompts.
-4. The API generates four outputs in parallel: bio, README, skills, and sponsor pitch.
+3. The template engine parses the user profile, languages, and featured repositories.
+4. The engine generates four outputs synchronously: bio, README, skills, and sponsor pitch.
 5. The frontend renders the result with copy-friendly tabs and markdown preview.
 
 ## Getting Started
@@ -59,25 +59,14 @@ Create a `.env.local` file and configure the following variables.
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `GROQ_API_KEY` | Yes | Used for content generation through the Groq API. |
-| `GITHUB_TOKEN` | No | Raises GitHub API rate limits and helps avoid anonymous request throttling. |
+| `GITHUB_TOKEN` | No | Raises GitHub API rate limits and helps avoid anonymous request throttling (strongly recommended). |
 
-### Generating API Keys
-
-#### Groq API Key
-
-1. Go to `https://console.groq.com/keys` and sign in to your Groq account.
-2. Open the API Keys page from the Groq console.
-3. Click `Create API Key` or `Generate Key`.
-4. Copy the generated key immediately after it is shown.
-5. Add it to `.env.local` as `GROQ_API_KEY`.
-
-#### GitHub Token
+### Generating a GitHub Token
 
 1. Open GitHub and go to `Settings > Developer settings > Personal access tokens`.
 2. Choose either `Tokens (classic)` or `Fine-grained tokens`.
 3. Click `Generate new token`.
-4. Give the token a name, choose an expiration, and grant read access for the profile data you need.
+4. Give the token a name, choose an expiration, and grant read access for public metadata.
 5. Create the token and copy it immediately after GitHub displays it.
 6. Add it to `.env.local` as `GITHUB_TOKEN`.
 
@@ -89,7 +78,6 @@ Recommended minimum access:
 Example:
 
 ```env
-GROQ_API_KEY=gsk_*************************
 GITHUB_TOKEN=github_*************************
 ```
 
@@ -143,7 +131,7 @@ Possible API errors:
 - `400` for missing or invalid usernames
 - `404` when the GitHub user does not exist
 - `429` when GitHub rate limits are exceeded
-- `500` when the Groq API key is missing or another server error occurs
+- `500` for general server errors
 
 ## Project Structure
 
@@ -166,8 +154,7 @@ readme.gen/
 │   └── ResultTabs.tsx
 ├── lib/
 │   ├── github.ts
-│   ├── groq.ts
-│   └── promptBuilder.ts
+│   └── templateGenerator.ts
 ├── types/
 │   └── index.ts
 ├── .env.example
@@ -179,7 +166,7 @@ readme.gen/
 
 This project is suitable for deployment on platforms that support Next.js applications, including Vercel.
 
-Before deploying, make sure `GROQ_API_KEY` is configured in your hosting environment. Add `GITHUB_TOKEN` as well if you want higher GitHub API limits in production.
+Before deploying, make sure `GITHUB_TOKEN` is configured in your hosting environment if you want higher GitHub API limits in production.
 
 ## Contributing
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchGitHubData } from '@/lib/github';
-import { generateContent } from '@/lib/groq';
-import { buildPrompts } from '@/lib/promptBuilder';
+import { generateFromTemplate } from '@/lib/templateGenerator';
 import {
   DEFAULT_GENERATE_OPTIONS,
   type GenerateOptions,
@@ -169,36 +168,13 @@ async function buildGeneratedPayload(
   options: GenerateOptions
 ): Promise<GeneratedPayload> {
   const githubData = await fetchGitHubData(username);
-
-  const { bioPrompt, readmePrompt, skillsPrompt, sponsorPrompt } =
-    buildPrompts(githubData, options);
-
-  const [bio, readme, skills, sponsorPitch] = await Promise.all([
-    generateContent(bioPrompt, 200),
-    generateContent(readmePrompt, 2000),
-    generateContent(skillsPrompt, 800),
-    generateContent(sponsorPrompt, 800),
-  ]);
+  const content = generateFromTemplate(githubData, options);
 
   return {
     githubData,
-    content: { bio, readme, skills, sponsorPitch },
+    content,
     optionsUsed: options,
   };
-}
-
-function parseRetryHint(message: string): string | null {
-  const marker = 'please try again in ';
-  const index = message.toLowerCase().indexOf(marker);
-
-  if (index === -1) return null;
-
-  const hintStart = index + marker.length;
-  const remainder = message.slice(hintStart).trim();
-  const end = remainder.search(/[.\n]/);
-  const hint = (end === -1 ? remainder : remainder.slice(0, end)).trim();
-
-  return hint || null;
 }
 
 function formatApiError(error: unknown): { status: number; message: string } {
@@ -211,21 +187,17 @@ function formatApiError(error: unknown): { status: number; message: string } {
 
   if (
     lower.includes('rate limit') ||
-    lower.includes('too many requests') ||
-    lower.includes('tpm') ||
-    lower.includes('tpd')
+    lower.includes('too many requests')
   ) {
-    const retryHint = parseRetryHint(rawMessage);
-    const message = retryHint
-      ? `AI provider rate limit reached. Please try again in ${retryHint}.`
-      : 'AI provider rate limit reached. Please try again in a few minutes.';
-
-    return { status: 429, message };
+    return {
+      status: 429,
+      message: 'GitHub API rate limit reached. Add a GITHUB_TOKEN to increase limits.',
+    };
   }
 
   return {
     status: 500,
-    message: 'Failed to generate README content right now. Please try again shortly.',
+    message: 'Failed to generate README content. Please try again shortly.',
   };
 }
 
@@ -263,12 +235,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!process.env.GROQ_API_KEY) {
-      return NextResponse.json(
-        { error: 'Groq API key is not configured.' },
-        { status: 500 }
-      );
-    }
+
 
     const options = normalizeOptions(body.options);
     const cacheKey = getCacheKey(username, options);
