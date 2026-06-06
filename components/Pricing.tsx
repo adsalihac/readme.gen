@@ -42,7 +42,7 @@ export function Pricing({ onStartGenerating }: PricingProps) {
   ];
 
   return (
-    <section id="pricing" className="relative border-t border-gray-100 bg-gray-50/50 py-24 sm:py-32">
+    <section id="pricing" className="relative scroll-mt-14 border-t border-gray-100 bg-gray-50/50 py-16 sm:py-20">
       {/* Background patterns */}
       <div className="pointer-events-none absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-indigo-600/10 ring-1 ring-indigo-50 sm:mr-28 lg:mr-0" />
 
@@ -59,7 +59,7 @@ export function Pricing({ onStartGenerating }: PricingProps) {
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="mx-auto mt-16 grid max-w-sm grid-cols-1 gap-y-10 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-x-8">
+        <div className="mx-auto mt-10 grid max-w-sm grid-cols-1 gap-y-10 sm:mt-12 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-x-8">
           
           {/* Free Tier Card */}
           <div className="relative flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 sm:p-10">
@@ -87,7 +87,7 @@ export function Pricing({ onStartGenerating }: PricingProps) {
                   <svg className="h-6 w-5 flex-none text-gray-300" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
                   </svg>
-                  Includes "readme.gen" footer branding
+                  Includes &quot;readme.gen&quot; footer branding
                 </li>
               </ul>
             </div>
@@ -167,7 +167,7 @@ export function Pricing({ onStartGenerating }: PricingProps) {
 
             {isSubmitted ? (
               <div className="mt-6 rounded-xl bg-emerald-50 p-4 text-center border border-emerald-100 animate-scale-up">
-                <span className="text-xs font-semibold text-emerald-800">🎉 You're on the list! Thank you!</span>
+                <span className="text-xs font-semibold text-emerald-800">🎉 You&apos;re on the list! Thank you!</span>
               </div>
             ) : (
               <form onSubmit={handleJoinWaitlist} className="mt-6 space-y-4">

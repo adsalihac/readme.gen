@@ -6,7 +6,7 @@ interface HeroProps {
 
 export function Hero({ onOpenModal }: HeroProps) {
   return (
-    <section className="flex flex-1 flex-col items-center justify-center px-4 text-center animate-fade-in">
+    <section className="flex min-h-[calc(100svh-10rem)] flex-col items-center justify-center px-4 py-12 text-center animate-fade-in sm:min-h-[calc(100svh-9rem)]">
       {/* Badge */}
       <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-1.5 text-sm text-gray-500">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
