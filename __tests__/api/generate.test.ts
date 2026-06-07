@@ -121,4 +121,17 @@ describe('POST /api/generate premium sanitization', () => {
     });
     expect(body.content.blogWorkflow).toBe('workflow');
   });
+
+  it('returns a clear error when the GitHub token is invalid', async () => {
+    vi.mocked(getCurrentPlan).mockResolvedValue('free');
+    vi.mocked(fetchGitHubData).mockRejectedValue(
+      new Error('GitHub token is invalid. Update or remove GITHUB_TOKEN.')
+    );
+
+    const response = await POST(makeRequest('testuser', {}));
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.error).toBe('GitHub token is invalid. Update or remove GITHUB_TOKEN.');
+  });
 });

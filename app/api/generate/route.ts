@@ -133,6 +133,17 @@ function formatApiError(error: unknown): { status: number; message: string } {
   }
 
   if (
+    lower.includes('bad credentials') ||
+    lower.includes('token is invalid') ||
+    lower.includes('invalid github token')
+  ) {
+    return {
+      status: 401,
+      message: 'GitHub token is invalid. Update or remove GITHUB_TOKEN.',
+    };
+  }
+
+  if (
     lower.includes('rate limit') ||
     lower.includes('too many requests')
   ) {
