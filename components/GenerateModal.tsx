@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { DEFAULT_GENERATE_OPTIONS, type GenerateOptions, type WorkExperience } from '@/types';
+import type { UserPlan } from '@/lib/entitlements';
 
 interface GitHubSuggestion {
   login: string;
@@ -12,6 +13,8 @@ interface GitHubSuggestion {
 
 interface GenerateModalProps {
   isOpen: boolean;
+  plan: UserPlan;
+  onUpgrade: () => void;
   onClose: () => void;
   onGenerate: (username: string, options: GenerateOptions) => void;
 }
@@ -33,6 +36,8 @@ const NARRATIVES: Array<{
 
 export function GenerateModal({
   isOpen,
+  plan,
+  onUpgrade,
   onClose,
   onGenerate,
 }: Readonly<GenerateModalProps>) {
@@ -47,6 +52,7 @@ export function GenerateModal({
   const [configTab, setConfigTab] = useState<'basics' | 'experience' | 'integrations'>('basics');
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPro = plan === 'pro';
 
   const addExperience = () => {
     setOptions((prev) => ({
@@ -147,7 +153,7 @@ export function GenerateModal({
   const handleSubmit = () => {
     const trimmed = username.trim();
     if (!trimmed) return;
-    onGenerate(trimmed, options);
+    onGenerate(trimmed, isPro ? options : { ...DEFAULT_GENERATE_OPTIONS });
     onClose();
   };
 
@@ -339,21 +345,27 @@ export function GenerateModal({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setConfigTab('experience')}
+                  onClick={() => {
+                    if (isPro) setConfigTab('experience');
+                  }}
+                  disabled={!isPro}
                   className={`text-xs font-semibold px-2.5 py-1 rounded-md transition-colors ${
                     configTab === 'experience' ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:text-gray-800'
-                  }`}
+                  } disabled:cursor-not-allowed disabled:opacity-45`}
                 >
-                  Experience
+                  Experience {!isPro ? 'Pro' : ''}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setConfigTab('integrations')}
+                  onClick={() => {
+                    if (isPro) setConfigTab('integrations');
+                  }}
+                  disabled={!isPro}
                   className={`text-xs font-semibold px-2.5 py-1 rounded-md transition-colors ${
                     configTab === 'integrations' ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:text-gray-800'
-                  }`}
+                  } disabled:cursor-not-allowed disabled:opacity-45`}
                 >
-                  Integrations
+                  Integrations {!isPro ? 'Pro' : ''}
                 </button>
               </div>
               <button
@@ -365,6 +377,23 @@ export function GenerateModal({
               </button>
             </div>
 
+            {!isPro && (
+              <div className="mb-4 rounded-lg border border-indigo-100 bg-indigo-50 px-3 py-2.5 text-xs text-indigo-900">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <span>
+                    Pro unlocks voice tuning, advanced insights, work experience, integrations, no-branding, and deploy.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onUpgrade}
+                    className="rounded-full bg-indigo-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-indigo-500"
+                  >
+                    Upgrade
+                  </button>
+                </div>
+              </div>
+            )}
+
             {configTab === 'basics' && (
               <div className="space-y-4">
                 <div>
@@ -374,6 +403,7 @@ export function GenerateModal({
                       <button
                         key={voice.value}
                         type="button"
+                        disabled={!isPro}
                         onClick={() =>
                           setOptions((prev) => ({
                             ...prev,
@@ -384,7 +414,7 @@ export function GenerateModal({
                           options.voiceStyle === voice.value
                             ? 'border-gray-900 bg-gray-900 text-white'
                             : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
-                        }`}
+                        } disabled:cursor-not-allowed disabled:opacity-45`}
                       >
                         {voice.label}
                       </button>
@@ -397,6 +427,7 @@ export function GenerateModal({
                   <div className="flex gap-2">
                     <button
                       type="button"
+                      disabled={!isPro}
                       onClick={() =>
                         setOptions((prev) => ({
                           ...prev,
@@ -407,12 +438,13 @@ export function GenerateModal({
                         options.insightDepth === 'standard'
                           ? 'border-gray-900 bg-gray-900 text-white'
                           : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
-                      }`}
+                      } disabled:cursor-not-allowed disabled:opacity-45`}
                     >
                       Standard
                     </button>
                     <button
                       type="button"
+                      disabled={!isPro}
                       onClick={() =>
                         setOptions((prev) => ({
                           ...prev,
@@ -423,7 +455,7 @@ export function GenerateModal({
                         options.insightDepth === 'advanced'
                           ? 'border-gray-900 bg-gray-900 text-white'
                           : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
-                      }`}
+                      } disabled:cursor-not-allowed disabled:opacity-45`}
                     >
                       Advanced
                     </button>
@@ -437,6 +469,7 @@ export function GenerateModal({
                       <button
                         key={narrative.value}
                         type="button"
+                        disabled={!isPro}
                         onClick={() =>
                           setOptions((prev) => ({
                             ...prev,
@@ -447,7 +480,7 @@ export function GenerateModal({
                           options.sponsorNarrative === narrative.value
                             ? 'border-gray-900 bg-gray-900 text-white'
                             : 'border-gray-300 bg-white text-gray-600 hover:border-gray-500'
-                        }`}
+                        } disabled:cursor-not-allowed disabled:opacity-45`}
                       >
                         {narrative.label}
                       </button>
@@ -455,10 +488,11 @@ export function GenerateModal({
                   </div>
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-3">
                   <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
                     <input
                       type="checkbox"
+                      disabled={!isPro}
                       checked={options.includeAchievements}
                       onChange={(e) =>
                         setOptions((prev) => ({
@@ -473,6 +507,7 @@ export function GenerateModal({
                   <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
                     <input
                       type="checkbox"
+                      disabled={!isPro}
                       checked={options.includeCallToAction}
                       onChange={(e) =>
                         setOptions((prev) => ({
@@ -483,6 +518,21 @@ export function GenerateModal({
                       className="h-3.5 w-3.5"
                     />
                     <span>Add sponsor call to action</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      disabled={!isPro}
+                      checked={!options.includeBranding}
+                      onChange={(e) =>
+                        setOptions((prev) => ({
+                          ...prev,
+                          includeBranding: !e.target.checked,
+                        }))
+                      }
+                      className="h-3.5 w-3.5"
+                    />
+                    <span>Remove readme.gen branding</span>
                   </label>
                 </div>
               </div>

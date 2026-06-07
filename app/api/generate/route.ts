@@ -1,26 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchGitHubData } from '@/lib/github';
 import { generateFromTemplate } from '@/lib/templateGenerator';
-import {
-  DEFAULT_GENERATE_OPTIONS,
-  type GenerateOptions,
-  type InsightDepth,
-  type SponsorNarrative,
-  type VoiceStyle,
-  type WorkExperience,
-} from '@/types';
+import { sanitizeGenerateOptionsForPlan } from '@/lib/generate-options';
+import { getCurrentPlan } from '@/lib/entitlements';
+import type { GeneratedContent, GenerateOptions } from '@/types';
 
 // Validate GitHub username format
 const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 
 type GeneratedPayload = {
   githubData: Awaited<ReturnType<typeof fetchGitHubData>>;
-  content: {
-    bio: string;
-    readme: string;
-    skills: string;
-    sponsorPitch: string;
-  };
+  content: GeneratedContent;
   optionsUsed: GenerateOptions;
 };
 
@@ -116,74 +106,6 @@ function setCachedPayload(username: string, data: GeneratedPayload) {
   });
 }
 
-function asEnumValue<T extends string>(
-  value: unknown,
-  valid: readonly T[],
-  fallback: T
-): T {
-  return typeof value === 'string' && valid.includes(value as T)
-    ? (value as T)
-    : fallback;
-}
-
-function normalizeOptions(raw: unknown): GenerateOptions {
-  if (!raw || typeof raw !== 'object') {
-    return { ...DEFAULT_GENERATE_OPTIONS };
-  }
-
-  const parsed = raw as Partial<GenerateOptions>;
-
-  return {
-    voiceStyle: asEnumValue<VoiceStyle>(
-      parsed.voiceStyle,
-      ['professional', 'friendly', 'bold'],
-      DEFAULT_GENERATE_OPTIONS.voiceStyle
-    ),
-    insightDepth: asEnumValue<InsightDepth>(
-      parsed.insightDepth,
-      ['standard', 'advanced'],
-      DEFAULT_GENERATE_OPTIONS.insightDepth
-    ),
-    sponsorNarrative: asEnumValue<SponsorNarrative>(
-      parsed.sponsorNarrative,
-      ['impact', 'journey', 'milestones'],
-      DEFAULT_GENERATE_OPTIONS.sponsorNarrative
-    ),
-    includeAchievements:
-      typeof parsed.includeAchievements === 'boolean'
-        ? parsed.includeAchievements
-        : DEFAULT_GENERATE_OPTIONS.includeAchievements,
-    includeCallToAction:
-      typeof parsed.includeCallToAction === 'boolean'
-        ? parsed.includeCallToAction
-        : DEFAULT_GENERATE_OPTIONS.includeCallToAction,
-    workExperiences: Array.isArray(parsed.workExperiences)
-      ? parsed.workExperiences
-          .map((item: any) => {
-            if (item && typeof item === 'object') {
-              return {
-                company: String(item.company ?? ''),
-                role: String(item.role ?? ''),
-                period: String(item.period ?? ''),
-                description: String(item.description ?? ''),
-              };
-            }
-            return null;
-          })
-          .filter(Boolean) as WorkExperience[]
-      : DEFAULT_GENERATE_OPTIONS.workExperiences,
-    wakatimeUsername: typeof parsed.wakatimeUsername === 'string'
-      ? parsed.wakatimeUsername
-      : DEFAULT_GENERATE_OPTIONS.wakatimeUsername,
-    includeStreakStats: typeof parsed.includeStreakStats === 'boolean'
-      ? parsed.includeStreakStats
-      : DEFAULT_GENERATE_OPTIONS.includeStreakStats,
-    blogFeedUrl: typeof parsed.blogFeedUrl === 'string'
-      ? parsed.blogFeedUrl
-      : DEFAULT_GENERATE_OPTIONS.blogFeedUrl,
-  };
-}
-
 function getCacheKey(username: string, options: GenerateOptions): string {
   return `${username}:${JSON.stringify(options)}`;
 }
@@ -259,10 +181,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-
-
-    const options = normalizeOptions(body.options);
+    const plan = await getCurrentPlan();
+    const options = sanitizeGenerateOptionsForPlan(body.options, plan);
     const cacheKey = getCacheKey(username, options);
 
     const cached = getCachedPayload(cacheKey);

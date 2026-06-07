@@ -1,28 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import type { CurrentUser, UserPlan } from '@/lib/entitlements';
 
 interface PricingProps {
+  checkoutState: 'idle' | 'loading';
+  plan: UserPlan;
+  user: CurrentUser | null;
+  onCheckout: () => void;
+  onSignIn: () => void;
   onStartGenerating: () => void;
 }
 
-export function Pricing({ onStartGenerating }: PricingProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleJoinWaitlist = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setIsSubmitted(true);
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setEmail('');
-        setIsModalOpen(false);
-      }, 3000);
-    }
-  };
-
+export function Pricing({
+  checkoutState,
+  plan,
+  user,
+  onCheckout,
+  onSignIn,
+  onStartGenerating,
+}: Readonly<PricingProps>) {
   const freeFeatures = [
     'Unlimited profile generation',
     'Standard layouts & styles',
@@ -33,12 +29,12 @@ export function Pricing({ onStartGenerating }: PricingProps) {
 
   const proFeatures = [
     'Everything in Free',
-    'AI-Tailored rewrites (recruiter-ready)',
-    'Dynamic live Spotify widget',
-    'GitHub App automatic daily sync',
-    'Premium header banner generator',
-    'No "readme.gen" branding logo',
-    'Priority updates & support',
+    'Voice style and advanced insight controls',
+    'Sponsor narrative and richer profile sections',
+    'Work experience, WakaTime, blog, and streak integrations',
+    'No "readme.gen" footer branding',
+    'Deploy tab for direct GitHub README updates',
+    'All future Pro v1 improvements',
   ];
 
   return (
@@ -54,7 +50,7 @@ export function Pricing({ onStartGenerating }: PricingProps) {
             Empower your GitHub profile
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Generate your basic README for free forever, or upgrade to Pro to unlock advanced AI personalizations, automated sync, and premium graphics.
+            Generate a clean README for free forever, or upgrade once through Polar to unlock advanced controls, integrations, no-branding output, and direct deploy.
           </p>
         </div>
 
@@ -117,7 +113,7 @@ export function Pricing({ onStartGenerating }: PricingProps) {
                 <span className="text-sm font-semibold leading-6 text-gray-500">one-time payment</span>
               </div>
               <p className="mt-6 text-base leading-7 text-gray-600">
-                For professionals looking to build a stellar personal brand and stand out to top recruiters.
+                Checkout is handled securely by Polar, and Pro access activates automatically after the payment webhook is received.
               </p>
               <ul role="list" className="mt-8 space-y-4 text-sm leading-6 text-gray-600">
                 {proFeatures.map((feature, idx) => (
@@ -131,69 +127,22 @@ export function Pricing({ onStartGenerating }: PricingProps) {
               </ul>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="mt-8 block rounded-full bg-indigo-600 px-3 py-3 text-center text-sm font-semibold text-white hover:bg-indigo-500 active:scale-[0.98] transition-all shadow-sm shadow-indigo-600/20"
+              onClick={plan === 'pro' ? undefined : user ? onCheckout : onSignIn}
+              disabled={plan === 'pro' || checkoutState === 'loading'}
+              className="mt-8 block rounded-full bg-indigo-600 px-3 py-3 text-center text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition-all hover:bg-indigo-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Get Pro Access
+              {plan === 'pro'
+                ? 'Pro Active'
+                : checkoutState === 'loading'
+                  ? 'Opening Checkout...'
+                  : user
+                    ? 'Upgrade to Pro'
+                    : 'Sign in to Upgrade'}
             </button>
           </div>
 
         </div>
       </div>
-
-      {/* Waitlist Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl animate-scale-up">
-            {/* Close button */}
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 transition-colors"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <div className="text-center">
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-2xl">
-                🚀
-              </span>
-              <h3 className="mt-4 text-lg font-bold text-gray-900">Join the Pro Waitlist</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                We are actively building our Premium AI tailoring, dynamic Spotify integration, and auto-sync features. Join the waitlist today and get **50% off** at launch!
-              </p>
-            </div>
-
-            {isSubmitted ? (
-              <div className="mt-6 rounded-xl bg-emerald-50 p-4 text-center border border-emerald-100 animate-scale-up">
-                <span className="text-xs font-semibold text-emerald-800">🎉 You&apos;re on the list! Thank you!</span>
-              </div>
-            ) : (
-              <form onSubmit={handleJoinWaitlist} className="mt-6 space-y-4">
-                <div>
-                  <label htmlFor="waitlist-email" className="sr-only">Email address</label>
-                  <input
-                    id="waitlist-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm placeholder-gray-400 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full rounded-xl bg-gray-900 py-3 text-sm font-semibold text-white hover:bg-gray-700 active:scale-[0.98] transition-all"
-                >
-                  Join Waitlist
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
     </section>
   );
 }

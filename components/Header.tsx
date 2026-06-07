@@ -2,10 +2,23 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import type { CurrentUser, UserPlan } from '@/lib/entitlements';
 
 const REPO_URL = 'https://github.com/adsalihac/readme.gen';
 
-export function Header() {
+interface HeaderProps {
+  user: CurrentUser | null;
+  plan: UserPlan;
+  onSignIn: () => void;
+  onSignOut: () => void;
+}
+
+export function Header({
+  user,
+  plan,
+  onSignIn,
+  onSignOut,
+}: Readonly<HeaderProps>) {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
@@ -29,6 +42,29 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {user ? (
+            <>
+              <span className="hidden rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600 sm:inline-flex">
+                {plan === 'pro' ? 'Pro active' : 'Free'}
+              </span>
+              <button
+                type="button"
+                onClick={onSignOut}
+                className="hidden rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-all hover:border-gray-300 hover:text-gray-900 sm:inline-flex"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={onSignIn}
+              className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50"
+            >
+              Sign in
+            </button>
+          )}
+
           {/* Pricing Link */}
           <a
             href="#pricing"

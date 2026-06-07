@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { GenerateOptions, GeneratedContent, TabKey } from '@/types';
+import type { UserPlan } from '@/lib/entitlements';
 import { MarkdownPreview } from './MarkdownPreview';
 
 interface ResultTabsProps {
   content: GeneratedContent;
   options: GenerateOptions;
+  plan: UserPlan;
+  onUpgrade: () => void;
   onRegenerate: () => void;
 }
 
@@ -27,6 +30,8 @@ function getCurrentFileName(activeTab: TabKey): string {
 export function ResultTabs({
   content,
   options,
+  plan,
+  onUpgrade,
   onRegenerate,
 }: Readonly<ResultTabsProps>) {
   const [activeTab, setActiveTab] = useState<TabKey>('bio');
@@ -38,11 +43,15 @@ export function ResultTabs({
   const [deploySteps, setDeploySteps] = useState<Array<{ label: string; status: 'pending' | 'active' | 'done' | 'failed' }>>([]);
   const [deployError, setDeployError] = useState('');
   const [repoUrl, setRepoUrl] = useState('');
+  const isPro = plan === 'pro';
+  const visibleTabs = isPro ? TABS : TABS.filter((tab) => tab.key !== 'deploy');
 
   // Load PAT from localStorage on mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('__github_pat_token');
-    if (savedToken) setPatToken(savedToken);
+    setTimeout(() => {
+      const savedToken = localStorage.getItem('__github_pat_token');
+      if (savedToken) setPatToken(savedToken);
+    }, 0);
   }, []);
 
   const contentMap: Record<TabKey, string> = {
@@ -215,7 +224,7 @@ export function ResultTabs({
     <div className="animate-slide-up">
       {/* Tab bar */}
       <div className="mb-3 flex gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
-        {TABS.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => {
@@ -234,6 +243,15 @@ export function ResultTabs({
             {tab.label}
           </button>
         ))}
+        {!isPro && (
+          <button
+            type="button"
+            onClick={onUpgrade}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-sm font-medium text-indigo-700 transition-all hover:bg-white"
+          >
+            Deploy Pro
+          </button>
+        )}
       </div>
 
       {/* Panel */}

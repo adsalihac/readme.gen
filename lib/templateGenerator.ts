@@ -313,29 +313,30 @@ function generateReadme(
     techBadges || '_No recognized languages detected_',
     '',
     ...(experienceSection ? [experienceSection, ''] : []),
-    '##  Featured Projects',
+    '## Featured Projects',
     '',
     ...(featuredLines.length > 0 ? featuredLines : ['_No public repositories yet_']),
     '',
-    '##  📊 GitHub Stats',
+    '## 📊 GitHub Stats',
     '',
     statsSection,
     '',
     ...(blogSection ? [blogSection, ''] : []),
-    '##  🔍 Profile Insights',
+    '## 🔍 Profile Insights',
     '',
     ...insights,
     '',
     ...(achievementsSection ? [achievementsSection, ''] : []),
-    '##  📫 Connect',
+    '## 📫 Connect',
     '',
     ...connectLinks,
   ];
 
-  return (
-    sections.join('\n') +
-    '\n\n---\n\n<p align="center">Generated with ❤️ using <a href="https://github.com/adsalihac/readme.gen">readme.gen</a></p>'
-  );
+  const brandingFooter = options.includeBranding
+    ? '\n\n---\n\n<p align="center">Generated with ❤️ using <a href="https://github.com/adsalihac/readme.gen">readme.gen</a></p>'
+    : '';
+
+  return sections.join('\n') + brandingFooter;
 }
 
 function generateInsights(

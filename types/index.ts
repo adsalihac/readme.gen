@@ -58,6 +58,7 @@ export interface GenerateOptions {
   sponsorNarrative: SponsorNarrative;
   includeAchievements: boolean;
   includeCallToAction: boolean;
+  includeBranding: boolean;
   workExperiences?: WorkExperience[];
   wakatimeUsername?: string;
   includeStreakStats?: boolean;
@@ -66,10 +67,11 @@ export interface GenerateOptions {
 
 export const DEFAULT_GENERATE_OPTIONS: GenerateOptions = {
   voiceStyle: 'professional',
-  insightDepth: 'advanced',
+  insightDepth: 'standard',
   sponsorNarrative: 'impact',
   includeAchievements: true,
   includeCallToAction: true,
+  includeBranding: true,
   workExperiences: [],
   wakatimeUsername: '',
   includeStreakStats: false,

@@ -124,6 +124,16 @@ describe('generateFromTemplate', () => {
     expect(result.skills).toBeTruthy();
     expect(result.sponsorPitch).toBeTruthy();
   });
+
+  it('removes readme.gen branding when requested', () => {
+    const { readme } = generateFromTemplate(
+      MOCK_DATA,
+      opts({ includeBranding: false })
+    );
+
+    expect(readme).not.toContain('Generated with');
+    expect(readme).not.toContain('readme.gen');
+  });
 });
 
 // ─── Bio ──────────────────────────────────────────────────────────────────────
