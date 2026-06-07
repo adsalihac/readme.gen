@@ -24,6 +24,7 @@ export async function fetchGitHubData(username: string): Promise<GitHubData> {
 
   if (!userRes.ok) {
     if (userRes.status === 404) throw new Error(`GitHub user "${username}" not found`);
+    if (userRes.status === 401) throw new Error('GitHub token is invalid. Update or remove GITHUB_TOKEN.');
     if (userRes.status === 403) throw new Error('GitHub API rate limit exceeded. Add a GITHUB_TOKEN to increase limits.');
     throw new Error('Failed to fetch GitHub profile');
   }

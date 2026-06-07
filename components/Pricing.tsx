@@ -113,7 +113,7 @@ export function Pricing({
                 <span className="text-sm font-semibold leading-6 text-gray-500">one-time payment</span>
               </div>
               <p className="mt-6 text-base leading-7 text-gray-600">
-                Checkout is handled securely by Polar, and Pro access activates automatically after the payment webhook is received.
+               For professionals looking to build a stellar personal brand and stand out to top recruiters.
               </p>
               <ul role="list" className="mt-8 space-y-4 text-sm leading-6 text-gray-600">
                 {proFeatures.map((feature, idx) => (

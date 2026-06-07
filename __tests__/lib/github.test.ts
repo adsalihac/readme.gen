@@ -86,6 +86,11 @@ describe('fetchGitHubData', () => {
     await expect(fetchGitHubData('testuser')).rejects.toThrow('rate limit');
   });
 
+  it('throws an invalid token error on 401', async () => {
+    vi.stubGlobal('fetch', makeFetch(401, 200));
+    await expect(fetchGitHubData('testuser')).rejects.toThrow('token is invalid');
+  });
+
   it('throws a generic error for other non-ok user responses', async () => {
     vi.stubGlobal('fetch', makeFetch(500, 200));
     await expect(fetchGitHubData('testuser')).rejects.toThrow('Failed to fetch GitHub profile');
