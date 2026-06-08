@@ -225,7 +225,7 @@ export function GenerateModal({
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <div>
             <h2 className="text-base font-semibold text-gray-900">Generate README</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Enter or search a GitHub username</p>
+            <p className="text-xs text-gray-400 mt-0.5">Enter a public GitHub username</p>
           </div>
           <button
             onClick={onClose}
@@ -256,7 +256,7 @@ export function GenerateModal({
                 onChange={(e) => handleInputChange(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                placeholder="Search GitHub username…"
+                placeholder="Search GitHub username..."
                 autoComplete="off"
                 spellCheck={false}
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-400 outline-none transition-all focus:border-gray-400 focus:bg-white focus:ring-2 focus:ring-gray-200"
@@ -381,14 +381,14 @@ export function GenerateModal({
               <div className="mb-4 rounded-lg border border-indigo-100 bg-indigo-50 px-3 py-2.5 text-xs text-indigo-900">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <span>
-                    Pro unlocks voice tuning, advanced insights, work experience, integrations, no-branding, and deploy.
+                    Pro unlocks tone control, deeper README insights, work history, add-ons, clean export, and publishing.
                   </span>
                   <button
                     type="button"
                     onClick={onUpgrade}
                     className="rounded-full bg-indigo-600 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-indigo-500"
                   >
-                    Upgrade
+                    Upgrade once
                   </button>
                 </div>
               </div>
@@ -397,7 +397,7 @@ export function GenerateModal({
             {configTab === 'basics' && (
               <div className="space-y-4">
                 <div>
-                  <p className="mb-2 text-xs text-gray-500">Voice style</p>
+                  <p className="mb-2 text-xs text-gray-500">README tone</p>
                   <div className="flex flex-wrap gap-2">
                     {VOICES.map((voice) => (
                       <button
@@ -423,7 +423,7 @@ export function GenerateModal({
                 </div>
 
                 <div>
-                  <p className="mb-2 text-xs text-gray-500">Profile insights</p>
+                  <p className="mb-2 text-xs text-gray-500">README depth</p>
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -463,7 +463,7 @@ export function GenerateModal({
                 </div>
 
                 <div>
-                  <p className="mb-2 text-xs text-gray-500">Sponsor storytelling</p>
+                  <p className="mb-2 text-xs text-gray-500">Sponsor story</p>
                   <div className="flex flex-wrap gap-2">
                     {NARRATIVES.map((narrative) => (
                       <button
@@ -532,7 +532,7 @@ export function GenerateModal({
                       }
                       className="h-3.5 w-3.5"
                     />
-                    <span>Remove readme.gen branding</span>
+                    <span>Remove readme.gen footer</span>
                   </label>
                 </div>
               </div>
@@ -540,7 +540,7 @@ export function GenerateModal({
 
             {configTab === 'experience' && (
               <div className="space-y-3 max-h-[35vh] overflow-y-auto pr-1">
-                <p className="text-xs text-gray-500 mb-2">Showcase your professional work experiences:</p>
+                <p className="text-xs text-gray-500 mb-2">Showcase relevant professional experience:</p>
                 {(options.workExperiences ?? []).map((exp, index) => (
                   <div key={index} className="relative rounded-lg border border-gray-200 bg-white p-3 space-y-2">
                     <button
@@ -594,7 +594,7 @@ export function GenerateModal({
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  Add Work Experience
+                  Add experience
                 </button>
               </div>
             )}
@@ -602,10 +602,10 @@ export function GenerateModal({
             {configTab === 'integrations' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1 font-medium">WakaTime Username</label>
+                  <label className="block text-xs text-gray-500 mb-1 font-medium">Activity username</label>
                   <input
                     type="text"
-                    placeholder="Enter WakaTime username"
+                    placeholder="Enter activity username"
                     value={options.wakatimeUsername ?? ''}
                     onChange={(e) =>
                       setOptions((prev) => ({
@@ -617,7 +617,7 @@ export function GenerateModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1 font-medium">Blog RSS Feed URL</label>
+                  <label className="block text-xs text-gray-500 mb-1 font-medium">Writing feed URL</label>
                   <input
                     type="url"
                     placeholder="e.g. https://medium.com/feed/@username"
@@ -644,7 +644,7 @@ export function GenerateModal({
                       }
                       className="h-3.5 w-3.5"
                     />
-                    <span>Include GitHub Streak Stats Card</span>
+                    <span>Include activity highlights</span>
                   </label>
                 </div>
               </div>
@@ -654,7 +654,7 @@ export function GenerateModal({
 
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-gray-100 px-5 py-4">
-          <p className="text-xs text-gray-400">No sign-up · Works with any public profile</p>
+          <p className="text-xs text-gray-400">No sign-up · Works with public GitHub profiles</p>
           <button
             onClick={handleSubmit}
             disabled={!username.trim()}
@@ -663,7 +663,7 @@ export function GenerateModal({
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Generate
+            Generate README
           </button>
         </div>
       </div>

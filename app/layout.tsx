@@ -15,18 +15,18 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'GitHub README Generator — AI-powered developer branding',
+  title: 'readme.gen — Professional README generator',
   description:
-    'Generate a polished GitHub README, bio, skill badges, and sponsor pitch in seconds using AI. Free, no sign-up required.',
+    'Generate a polished GitHub profile README, bio, skills summary, and sponsor copy in seconds. Free to start.',
   keywords: [
     'GitHub README generator',
-    'AI profile generator',
-    'developer branding',
-    'GitHub bio generator',
+    'profile README generator',
+    'professional README builder',
+    'developer profile README',
   ],
   openGraph: {
-    title: 'GitHub README Generator',
-    description: 'Build a GitHub profile that stands out — powered by AI.',
+    title: 'readme.gen',
+    description: 'Generate a professional profile README that earns attention.',
     type: 'website',
   },
 };

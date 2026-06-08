@@ -91,7 +91,7 @@ export default function Home() {
           } | null;
 
           if (!cancelled) {
-            setError(data?.error ?? 'Polar checkout is still being verified.');
+            setError(data?.error ?? 'Your upgrade is still being verified.');
           }
           return;
         }

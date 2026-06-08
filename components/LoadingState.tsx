@@ -9,17 +9,17 @@ export function LoadingState() {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
           <span className="text-sm text-gray-500 animate-pulse">
-            Fetching GitHub data and crafting your profile…
+            Reviewing public details and shaping your README…
           </span>
         </div>
         <div className="flex gap-4 text-xs text-gray-400">
           <span className="flex items-center gap-1">
             <span className="h-1 w-1 rounded-full bg-emerald-500" />
-            Fetching repos
+            Reading highlights
           </span>
           <span className="flex items-center gap-1">
             <span className="h-1 w-1 rounded-full bg-violet-500 animate-pulse" />
-            Generating content
+            Writing README
           </span>
           <span className="flex items-center gap-1">
             <span className="h-1 w-1 rounded-full bg-gray-300" />

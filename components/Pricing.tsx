@@ -20,21 +20,21 @@ export function Pricing({
   onStartGenerating,
 }: Readonly<PricingProps>) {
   const freeFeatures = [
-    'Unlimited profile generation',
-    'Standard layouts & styles',
-    'GitHub Stats & Streak cards',
-    'Skills badge generator',
-    'Manual commits to GitHub',
+    'Unlimited README drafts',
+    'Clean professional README sections',
+    'Public activity highlights',
+    'Skills and expertise summary',
+    'Copy-ready profile README',
   ];
 
   const proFeatures = [
-    'Everything in Free',
-    'Voice style and advanced insight controls',
-    'Sponsor narrative and richer profile sections',
-    'Work experience, WakaTime, blog, and streak integrations',
-    'No "readme.gen" footer branding',
-    'Deploy tab for direct GitHub README updates',
-    'All future Pro v1 improvements',
+    'Everything in the Starter plan',
+    'Tone, depth, and positioning controls',
+    'Stronger sponsor and credibility sections',
+    'Work experience, writing, and activity add-ons',
+    'Clean README export without footer branding',
+    'One-click README publishing workflow',
+    'All future premium improvements',
   ];
 
   return (
@@ -47,10 +47,10 @@ export function Pricing({
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-base font-semibold leading-7 text-indigo-600">Pricing</h2>
           <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Empower your GitHub profile
+            Build a sharper profile README
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Generate a clean README for free forever, or upgrade once through Polar to unlock advanced controls, integrations, no-branding output, and direct deploy.
+            Generate a polished README for free, or upgrade once to unlock deeper personalization, richer sections, and clean publishing.
           </p>
         </div>
 
@@ -61,14 +61,14 @@ export function Pricing({
           <div className="relative flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:border-gray-300 sm:p-10">
             <div>
               <h3 id="tier-hobby" className="text-base font-semibold leading-7 text-gray-900">
-                Free Tier
+                Starter
               </h3>
               <div className="mt-4 flex items-baseline gap-x-2">
                 <span className="text-5xl font-bold tracking-tight text-gray-900">$0</span>
                 <span className="text-sm font-semibold leading-6 text-gray-500">forever</span>
               </div>
               <p className="mt-6 text-base leading-7 text-gray-600">
-                Perfect for developers who want a quick, clean profile README without recurring costs.
+                Perfect for creating a clean GitHub profile README without recurring costs.
               </p>
               <ul role="list" className="mt-8 space-y-4 text-sm leading-6 text-gray-600">
                 {freeFeatures.map((feature) => (
@@ -83,7 +83,7 @@ export function Pricing({
                   <svg className="h-6 w-5 flex-none text-gray-300" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
                   </svg>
-                  Includes &quot;readme.gen&quot; footer branding
+                  Includes footer branding
                 </li>
               </ul>
             </div>
@@ -91,7 +91,7 @@ export function Pricing({
               onClick={onStartGenerating}
               className="mt-8 block rounded-full border border-gray-900 bg-transparent px-3 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-50 active:scale-[0.98] transition-all"
             >
-              Start Generating Free
+              Start free
             </button>
           </div>
 
@@ -106,14 +106,14 @@ export function Pricing({
 
             <div>
               <h3 id="tier-pro" className="text-base font-semibold leading-7 text-indigo-600">
-                Pro Developer
+                Professional
               </h3>
               <div className="mt-4 flex items-baseline gap-x-2">
                 <span className="text-5xl font-bold tracking-tight text-gray-900">$5</span>
                 <span className="text-sm font-semibold leading-6 text-gray-500">one-time payment</span>
               </div>
               <p className="mt-6 text-base leading-7 text-gray-600">
-               For professionals looking to build a stellar personal brand and stand out to top recruiters.
+                For people who want a stronger profile README and a more polished first impression.
               </p>
               <ul role="list" className="mt-8 space-y-4 text-sm leading-6 text-gray-600">
                 {proFeatures.map((feature, idx) => (
@@ -132,12 +132,12 @@ export function Pricing({
               className="mt-8 block rounded-full bg-indigo-600 px-3 py-3 text-center text-sm font-semibold text-white shadow-sm shadow-indigo-600/20 transition-all hover:bg-indigo-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {plan === 'pro'
-                ? 'Pro Active'
+                ? 'Pro active'
                 : checkoutState === 'loading'
                   ? 'Opening Checkout...'
                   : user
-                    ? 'Upgrade to Pro'
-                    : 'Sign in to Upgrade'}
+                    ? 'Upgrade once'
+                    : 'Sign in to upgrade'}
             </button>
           </div>
 

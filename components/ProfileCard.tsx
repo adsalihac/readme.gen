@@ -6,9 +6,9 @@ interface ProfileCardProps {
 }
 
 const STAT_ITEMS = (user: GitHubUser, totalStars: number) => [
-  { label: 'Repos', value: user.public_repos },
-  { label: 'Followers', value: user.followers.toLocaleString() },
-  { label: 'Stars', value: totalStars.toLocaleString() },
+  { label: 'Projects', value: user.public_repos },
+  { label: 'Audience', value: user.followers.toLocaleString() },
+  { label: 'Recognition', value: totalStars.toLocaleString() },
 ];
 
 function yearsSince(dateString: string): number {
@@ -29,15 +29,15 @@ export function ProfileCard({ githubData }: Readonly<ProfileCardProps>) {
   const insightItems = [
     {
       label: 'Influence',
-      value: `${followerRepoRatio.toFixed(1)} followers/repo`,
+      value: `${followerRepoRatio.toFixed(1)} audience/project`,
     },
     {
-      label: 'Star Velocity',
-      value: `${starsPerRepo.toFixed(1)} stars/repo`,
+      label: 'Project traction',
+      value: `${starsPerRepo.toFixed(1)} recognition/project`,
     },
     {
       label: 'Tenure',
-      value: `${Math.max(1, Math.floor(accountYears))} years on GitHub`,
+      value: `${Math.max(1, Math.floor(accountYears))} years online`,
     },
     {
       label: 'Primary Stack',

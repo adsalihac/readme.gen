@@ -26,8 +26,8 @@ describe('premium UI gating', () => {
       />
     );
 
-    expect(screen.getByText(/Pro unlocks voice tuning/)).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Upgrade' })).toBeTruthy();
+    expect(screen.getByText(/Pro unlocks tone control/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Upgrade once' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Experience Pro' })).toHaveProperty('disabled', true);
   });
 
@@ -42,8 +42,8 @@ describe('premium UI gating', () => {
       />
     );
 
-    expect(screen.queryByRole('button', { name: 'Deploy' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Deploy Pro' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Publish' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Publish with Pro' })).toBeTruthy();
   });
 
   it('shows the deploy tab for Pro users', () => {
@@ -57,7 +57,7 @@ describe('premium UI gating', () => {
       />
     );
 
-    expect(screen.getByRole('button', { name: 'Deploy' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Deploy Pro' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Publish' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Publish with Pro' })).toBeNull();
   });
 });
